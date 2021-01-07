@@ -40,7 +40,7 @@
 --     print(key, value)
 -- end
 
-local offlineList = {}
+-- local offlineList = {}
 -- offlineList[70] = {}
 -- table.insert(offlineList[70], 134789187348917)
 -- table.insert(offlineList[70], 13478918000000)
@@ -56,5 +56,29 @@ local offlineList = {}
 --         print(playerId)
 --     end
 -- end
-offlineList.hello = 5
-print(offlineList["hello"])
+-- offlineList[1] = {}
+-- offlineList[1][0] = 3130918
+-- print("finish")
+-- local s = "one;two;;four"
+-- local words = {}
+-- for w in s:gmatch("([^;]*)") do
+--     table.insert(words, w)
+-- end
+-- for _, item in ipairs(words) do
+--     print(item)
+-- end
+-- if words[3] == "" then
+--     print("right")
+-- end
+
+function print_ipairs(t)
+    for k, v in ipairs(t) do
+        print(k)
+    end
+end
+
+local t = {}
+t[1] = 0
+t[100] = 0
+
+print_ipairs(t)
