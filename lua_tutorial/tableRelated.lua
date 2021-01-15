@@ -71,14 +71,21 @@
 --     print("right")
 -- end
 
-function print_ipairs(t)
-    for k, v in ipairs(t) do
-        print(k)
-    end
+-- function print_ipairs(t)
+--     for k, v in ipairs(t) do
+--         print(k)
+--     end
+-- end
+
+-- local t = {}
+-- t[1] = 0
+-- t[100] = 0
+
+-- print_ipairs(t)
+
+local tempTable = {1, 2, "hello", "world", 5.7}
+table.insert(tempTable, 20)
+table.insert(tempTable, nil)
+for _, value in pairs(tempTable) do
+    print(value)
 end
-
-local t = {}
-t[1] = 0
-t[100] = 0
-
-print_ipairs(t)
