@@ -8,7 +8,7 @@
 #
 # Subprograms Index:
 #	Exit - 		Call syscall with a server 10 to exit the program 
-# 	PrintNewLine - 	Print a new line character (\n) to the console
+# 	NewLine - 	Print a new line character (\n) to the console
 # 	PrintInt - 	print a string with an integer to the console
 # 	PrintString - 	print a string to the console
 # 	PromptInt - 	Prompt the user to enter an integer, and return it to the calling program.
