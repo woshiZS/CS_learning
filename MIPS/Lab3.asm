@@ -1,84 +1,110 @@
-# Program: Lab3.asm
-# Author: Jason Heywood
-# Program to print a diamond
+##################################################################
+# Created by: Mingze, Guo
+# 	      mguo12
+#	      10 February 2021
+#
+# Assignment: Lab 3: ASCII-risks
+#		     CMPE 012, Computer Systems and Assembly Language
+# 		     UC Santa Cruz, Winter 2021
+#
+# Description: This program is used to print numbers and asterisks to show a reverse diamond to the console
+#
+# Notes:	This program is intended to run from the MARS IDE.
+##################################################################
 # Pseudo Code
-# register i = input("Enter the height of the pattern(must be greater than 0):\t")
-# while(i<0){
+# int n = input("Enter the height of the pattern(must be greater than 0):\t")
+# while(n<0){
 #	print("Invalid Entry!\n")
-#	register i = input("Enter the height of the pattern(must be greater than 0):\t")	
+#	int n = input("Enter the height of the pattern(must be greater than 0):\t")	
 # }
-# for (int j = 0; j < i; ++j){
-#	for(int k = 0; k < j; ++k){
+# for (int i = 0; j < n; i++){
+#	for(int j = 0; j < i; j++){
 #		print("*\t")
 #	}
-#	print(j+1)
-#	for (int k = 0; k < j; ++k){
+#	print(i+1)
+#	for (int j = 0; j < i; j++){
 #		print("\t*")
 # 	}
 # }
 #	print("\n")
-#
 .text
-user_input:
-	# read user input and record it
-	la $a0, prompt
-	jal PromptInt
-	
-	# judge if input is greater than zero
-	move $s0, $v0
-	sle $t0, $s0, 0
-	beqz $t0, output
-	la $a0, invalid
-	jal PrintString
-	b user_input 
-
-output:
-	# $t0 must be zero if it goes here
-	# print each line
-	# set a counter
-	slt $t1, $t0, $s0
-	beqz $t1, end_program
-	
-	move $t2, $zero
-inside_as1:
-	# set another counter for inside for loop which print the asterisks
-	slt $t3, $t2, $t0
-	beqz $t3, printNum
-	la $a0, tailTab
-	jal PrintString
-	addi $t2, $t2, 1
-	b inside_as1
-	
-printNum:
-	# print an integer 
-	li $v0, 1
-	move $a0, $t0
-	addi $a0, $a0, 1
+READ_INPUT:
+	# prompt the user to enter a value
+	li $v0, 4
+	la $a0, Prompt
 	syscall
 	
+	# read the input
+	li $v0, 5
+	syscall
+	
+	# move n from $v0 to $t0
+	move $t0, $v0
+	
+	# check if $t0 is greater than 0, if true, jump to the next part, else print Invalid entry and jump back again
+	sgt $t1, $t0, 0
+	beq $t1, 1, FOR_LOOP
+	
+	# print Invalid 
+	li $v0, 4
+	la $a0, Invalid
+	syscall
+	
+	# jump back
+	b READ_INPUT
+	
+FOR_LOOP:
+	# set a counter and cleaer it to 0
+	move $t1, $zero
+	
+Pre:
+	# judge if $t1 is less than $t0, if true, go output part.
+	slt $t2, $t1, $t0
+	beqz $t2, Exit
+	
 	move $t2, $zero
-inside_as2:
-	# print the rest part of the asterisks
-	slt $t3, $t2, $t0
-	beqz $t3, outside
-	la $a0, headTab
-	jal PrintString
+First:
+	# inside for loop to print asterisks and tabs
+	slt $t3, $t2, $t1
+	beqz $t3, Mid
+	li $v0, 4
+	la $a0, Front
+	syscall
 	addi $t2, $t2, 1
-	b inside_as2
+	b First
 
-outside:
-	# print a new line and add 1 to outside loop's couter
-	jal PrintNewLine
-	addi $t0, $t0, 1
-	b output
+Mid:
+	# Print the number
+	li $v0, 1
+	addi $a0, $t1, 1
+	syscall
+
+	move $t2, $zero	
+Third:
+	# inside for loop to print asterisks and tabs (after number)
+	slt $t3, $t2, $t1
+	beqz $t3, Tail
+	li $v0, 4
+	la $a0, End
+	syscall
+	addi $t2, $t2, 1
+	b Third
+
+Tail:
+	# add the counter, print a new line and jump back
+	li $v0, 4
+	la $a0, NewLine
+	syscall
+	addi $t1, $t1, 1
+	b Pre
 	
-end_program:
+Exit:
 	# exit the program
-	jal Exit
-	
+	li $v0, 10
+	syscall
 .data
-	prompt: .asciiz "Enter the height of the pattern(must be greater than 0):\t"
-	invalid: .asciiz "\nInvalid Entry!\n"
-	tailTab: .asciiz "*\t"
-	headTab: .asciiz "\t*"
-.include "utils.asm"
+	Prompt: .asciiz "Enter the height of the pattern(must be greater than 0):\t"
+	Invalid: .asciiz "Invalid Entry!\n"
+	Front: .asciiz "*\t"
+	End: .asciiz "\t*"
+	NewLine: .asciiz "\n"
