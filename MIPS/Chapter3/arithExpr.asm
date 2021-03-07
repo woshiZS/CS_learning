@@ -5,7 +5,7 @@
 .text
 main:
 	# Output the prompt
-	addi $v0, $zero, 4
+	li $v0, 4
 	la $a0, prompt
 	syscall
 	
