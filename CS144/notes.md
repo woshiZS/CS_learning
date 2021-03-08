@@ -42,5 +42,4 @@ capacity应该是两部分长度总共的上限，问题在于他如果有应用
 * 之前有参考[这个链接](https://blog.csdn.net/kangyupl/article/details/108589594)，发现自己的思路存在一些问题，我最开始的写法是如果index符合条件就直接写入，而链接中的写法是先整合再统一写入。我这种写法的缺点就是，如果有unassemble bytes的话，写入之后可能会引发连锁写入，```index + data.size() > cache.begin()->_size```这种情况十分复杂。所以正确的做法应该是先在缓存，整合之后再写入byteStream。
 * 关于```capacity```的设计，按照lab文档中的设计图，应该是byteStream加缓存的上界是```capacity```，整个capacity的起点应该是```totalRead```, 因为应用读取完数据之后，缓冲区的起点要往右移的。所以读取string的时候，右边界超过```totalRead + capacity```可以直接丢掉。
 
-
-
+* 其他的细节主要是区间合并和unassemble bytes的更新，区间合并要讨论的情况还是比较多的，但是在图纸上画还是比较清楚的（大概四种情况）。另外一种是更行unassemble bytes的策略，这里我采用的是上面链接的策略，合并区间的函数返回合并区间的长度，每次合并之后总数减去返回值。另外合并按照排序规则，只需要向后融合，以及和向前一个节点融合（插入节点不为```cache.begin()```
