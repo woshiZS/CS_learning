@@ -56,3 +56,20 @@ capacity应该是两部分长度总共的上限，问题在于他如果有应用
 ![overload](./pics/overload.png)
 
 这里减号重载返回的是有符号数字..., 真的坑。
+
+#### 接收器部分
+
+* vscode配置，std optional无法识别，修改c_cpp_properties.json，将cppStandard修改为c++17，gnu++14好像不支持识别optional。
+* 关于window size和ack number比较好些，根据Lab1的思路来就可以了
+* 有些太过于细节的还不太好处理，比如收到第一个fin之后其实被动接受方是处于fin-state one的阶段，其实应该还有处理一个对方接受到自己fin的ack之后再等待一个time wait时间才可以关闭，但是这里好像处理不了那么多，只能按照Lab文档中的三个阶段来写。
+
+![receiverState](./pics/receiverState.png)
+
+这里用一个enum class比较好，后面加逻辑的时候用switch case的时候直接jmp过去会比用多重if else效率高一点（多重if else会做各种比较运算（beq, beqz那种），switch的话会直接给case做label， jmp过去）
+
+* 另外一个要注意的点就是要么选择不再switch语句中初始化，要么在单独初始化的地方用大括号结束那些变量的生命周期。
+* ```_state == state::listen```返回的window size也和syn_recv的时候是一样的。
+* syn和fin同时来的时候算直接改为fin（其实这种情况我有点不太理解，为什么第一次握手就直接接受了...)
+* 还有就是syn数据包收到之后，header没带ack也是可以接受的（貌似这一节有说过只关心蓝色圈圈内的那一部分），（估计这时候应该做一下判断，如果是syn_recv状态下，不做拦截，建议直接丢掉）
+* 最离谱的是第一次带syn有数据也要接收...，所以listen和syn区别好像不太大...，说好的三次握手呢？？？？
+* 总体上觉得还是有点面向测试用例来写，因为测试样例中所要求的的协议和我们实际学习到的TCP协议还是有比较大的区别的。
