@@ -73,3 +73,51 @@ capacity应该是两部分长度总共的上限，问题在于他如果有应用
 * 还有就是syn数据包收到之后，header没带ack也是可以接受的（貌似这一节有说过只关心蓝色圈圈内的那一部分），（估计这时候应该做一下判断，如果是syn_recv状态下，不做拦截，建议直接丢掉）
 * 最离谱的是第一次带syn有数据也要接收...，所以listen和syn区别好像不太大...，说好的三次握手呢？？？？
 * 总体上觉得还是有点面向测试用例来写，因为测试样例中所要求的的协议和我们实际学习到的TCP协议还是有比较大的区别的。
+
+### Lab 3
+
+每一端都有一个reciver和sender，sender的内部构造也和reciver类似，内部的byteStream内容由sender-side的应用来写，sender来读。
+
+sender要关心的包括： seqno, SYN, FIN, Payload
+
+关于本个Lab3, sender具体负责的功能：
+
+![senderFunctionality](./pics/senderFunctionality.png)
+
+* 有一个比较重要的点就是重传时间的设计（时间太长会加大延迟，时间太短会耗费宝贵的网络容量（这里指的是单位时间传输的数据))
+* 另外在窗口大小为0的时候，要当做窗口大小是1的时候来发送，这样接收方空出多余的空间可以第一时间1来通知发送方来发送新的数据。
+* 这里说一点题外话，这里看文档看了好几遍，还是不太懂，感觉还是要细致的理一遍，主要不知道方法把segment组装好之后怎么发送给peer.
+
+#### How does the sender know if a segment was lost
+
+* Tcp sender要保留发送的集合，并且调用tick函数来查看是否经过了太长的时间,并且以此为依据决定是否重传最早发送的数据。
+* 比较重要的一点就是超时的标准，这个lab的test集合会相对合理，完整的test会放在Lab4, The overall goal is to let the sender detect when segments go missing and need to be resent, in a timely manner , amount of  time to wait before resending is important.
+  1. Every few milliseconds your TCPSender's tick method will be called with an argument  that tells it how many miiliseconds have elapsed since the last  time the method was called.（刚开始的时候还不太清除这个函数的作用，以为要写一些并发相关的，后面发现应该是测试样例对这个函数进行调用，比如说经过50ms，就调用一次```tick(50)```这种）
+  2. 我们需要完成这样一个计时器，给定时间开始，时间经过RTO之后生效。
+  3. 每次当一个TCPSegment发送的时候，如果计时器没有被启动，我们应该启动这个计时器。
+  4. 当所有的外发数据都被确认之后，停止计时。
+  5. 当tick被调用并且重传计时器超时的时候。
+     * 重传最早的没有被全部确认的TCPSegment
+     * 当window size不为0的时候，记录连续重传次数，每次重传都将RTO时间翻倍。
+     * 重新将计时器时间设置为0以便开始下一轮的计时。
+  6. 当收到的ackno大于现有的ackno时候，将RTO设置为初始值，如果又有往外发送的数据，重新启动计时器。将连续重传次数设置为0.
+
+#### 测试
+
+* 测试的时候发现自己有的地方过度解读了，就比如最开始的时候处于CLOSED状态，这时候不需要stream里面有数据也可以直接发送SYN包.
+* 当stream里面没有数据的时候应该不发送空数据包，这里发送是因为被ack接收所引发，这里应该加一个条件判断，payload的长度等于0的时候直接跳出事件。
+* send_window测试中有一个没有考虑到，等于0的时候有可能有FIN标志，此时应该检测完fin标志之后再对seg.length_in_sequence_space()进行检查，如果是0的话，就直接返回而不是发包。
+
+* 第14个样例好像即使ackno < current ackno也要对window size进行更新。
+* 另外一个就是fill window应该一直填充直到size不够或者没有数据写入byteStream了，这里应该加一个while循环来读取。但是我加的时候判定条件是只对窗口大小进行判断，但是如果内部字节流之中没有数据也会一直循环，按理说没有数据的时候只要判断有没有FIN标志就可以了，发送完fin标志之后，就可以重新进入下一轮switch判断
+* 另外一个点是窗口大小刚好被数据写满，此时应该没有空间写入FIN标志，但是我这里原来也没有做判断。
+* 最后一个问题就是空包问题，debug几次发现，空包之前没有处理，最后发现还是unsigned溢出
+
+![attention](./pics/attention.png)
+
+这里贴一个成功截图（终于调通了，面向测试样例编程2333）：
+
+![image-20210319181053155](./pics/successlab3.png)
+
+### Lab4
+
