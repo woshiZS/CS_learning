@@ -74,3 +74,38 @@ Input Buffer来缓存客户端输入，减少网络延迟和抖动带来的卡�
 技能的前摇时间来抵消RTT的延迟
 
 UDP协议发送冗余数据
+
+
+
+## 物理同步
+
+* 这里先确定一个概念性的问题，物理同步指的是玩家的位置或者与玩家交互的对象的位置需要经过物理引擎模拟才可以得到结果，并且涉及到网络同步技术就可以称为物理同步。
+* 方法也与普通的网络同步相同
+* 涉及到多人竞技还是需要一个服务器来防止作弊。
+* 最为常见的就是动画前后摇，小炮W，机器人钩子，莫甘娜的Q,动画时间都不短的，不是即时的。
+* 进行拆分，需要进行验证的消息才快速转发到服务器，涉及到视野范围，AOI，SOI之类。
+* input buffer，发送冗余包，发送多个包来对抗丢包。
+* 如果是轻设交游戏，那可以采用大世界的同步方案，视野列表改动可能没有那么频繁。
+* 进行数据压缩，可以做到序列化里面？？同时同步的时候也可以做增量同步。
+
+### 分类
+
+1. deterministic lockstep(可以简单理解为input passing)：适用于竞速或者RTS
+2. 快照同步(send all the state as a blob(指二进制对象)， 适用于快照大小一百多字节甚至不到的情况)，FPS同步模型，quake最早使用，后续众多FPS做了改进。
+3. 快照同步的改进版
+
+## Halo: Reach
+
+* You are not forced to resend data.
+* Replication: state or event to a remote server.
+* Authority: Permission to update the persistent state of an object.
+
+* Prediction: Extrapolating the current properties of an entity based on historical authoritative data and local guesses about the future.
+* State Data:  
+
+* Events: could potentially be dropped.
+* Control data: as fast as we can.
+* 领域独立，黑色界面代表服务器转移
+* 首先序列化的objects 总优先值设置为0, 没有被序列化的物体优先值保留。
+* 接收方为了避免抖动和戛然停止，需要设置抖动缓冲区。
+* 带有物理的状态同步做外插值的时候可能还比较难处理，具体可以看gaffer解释的那段话。

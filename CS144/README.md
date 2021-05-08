@@ -121,3 +121,41 @@ sender要关心的包括： seqno, SYN, FIN, Payload
 
 ### Lab4
 
+这个lab主要是sender和receiver合作：
+
+Receiver职责：
+
+	* 如果RST位置被置1了，内外的stream都要设置为error状态并且中断连接。
+	* 将segment传递给TCPReceiver，来查看seqno，SYN，payload和FIN
+	* 如果ACK被设置，就告诉TCPSender两个数据： ackno和window_size
+	* 如果收到的segments有序列号，需要保证至少有一个segment发送用于回复，同时也可以表示ackno和window_size的变化。
+
+Sending segments：
+
+	* 只要TCPSender将一个segment push到了队列之中，就要发送出去，sender所做的工作包括seqno, SYN, payload, FIN.
+	* 在发送之前要添加ackno和window_size到segment的头部，如果存在ackno，还要将header中的ACK flag设置为true.
+
+时间策略：
+
+	* 操作系统会定时调用tick函数，TCPSender需要知道经过了多久时间。
+	* 当连续重传次数大于config设置的最大重传次数时，中断连接（即发送一个空包，将头部的RST标记设置为0）
+	* 在适当的时候结束连接。
+
+FAQ&corner cases
+
+	* 本次实验最重要是处理那些lingering的连接，以及对sender和receiver的整合
+	* 读取segment部分的内容在本次实验中不需要我们来操心。
+	* segment发送也只需要我们将数据push到队列里面即可，测试程序会利用接口将数据发送出去。
+	* 对于时间的判定也是和上一个Lab是一样的。
+	* 如果收到了reset的数据包，应该将内外的ByteStream的error flag设置为1.并且随后调用TCPConnection::active函数的调用都应该返回false。
+	* 发送RST数据包的情况有两种，一个是重传次数太多，第二种情况是TCPConnectin的destructor被调用。发送RST数据包和接收到RST数据包的状态应该是类似的，连接不再active并且内部ByteStream错误标记被设置为1。
+	* 除了在receiver收到任何有效信息之前，几乎所有的segment都带有ACK 标记。
+	* 窗口大小限制也需要考虑，比较一下_receiver的返回值和16位的限制即可
+
+#### TIPS
+
+* 刚开始的时候time_since_last_segment_received不知道怎么取做，因为不能调用操作系统有关时间的函数，所以在每次tick调用的时候时间加上参数即可。
+
+* 另外一个需要注意的点是，lab3和lab4对于发包的要求还不太一样，lab3中空包是不发的，但是lab4中如果对面有包来了，至少要回一个包，即使内部的_stream.size()是0，这时候应该发送一个空包（外加一个检查，另外一个问题是我把长度检查注释掉，lab3的check里面会被阻塞，后来查清是因为while死循环了，只有segment长度为0一个出口，注释掉就死循环了）
+* 还是第36个测试样例，close操作（end_input_stream）之后期待发送一个fin包，相当于四次挥手的第一步，但是我之前只设置了error state。
+

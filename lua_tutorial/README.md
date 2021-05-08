@@ -130,3 +130,42 @@ lua_register(L, "average", average);
 
 ### Chapter 7. The External World
 
+* 正常来说文件初始化的时候会将输入输出流设定为stdin和stdout。但是可以使用
+
+```lua
+io.input(filename)
+io.output(filename)
+```
+
+来进行重定向。
+
+* ```io.write()```可以有任意个参数。并且只有当你在需要quick-and-dirty的程序的时候才使用print, ```io.write()```不会像print那样添加额外的字符（如换行和tab符号）
+* ```io.write()```会将数字按照默认规则转化为字符串，如果你想定制化格式，需要使用```string.format()```函数。
+* ```read()```有一个额外的标志来表征自己所需要读取的内容（“a", "l", "L", "n", num），lua处理长字符串比较快，所以经常读取整个文件到一个字符串处理之后再写入一个文件。
+* 可以使用```io.lines()```来简化对每行内容的处理。
+* ```io.read("n")```会读取一个整数，如果当前文件读指针往后读取不到数字，则会返回nil。
+
+* ```io.read(0)```经常用于检测文件是否结尾，如果文件还有内容，函数会返回一个空字符串，如果文件已经到结尾，函数返回nil。
+
+#### complete IO model
+
+```lua
+local f = assert(io.open(filename, "r"))
+local t = f:read("a")
+f:close()
+```
+
+* 以上是文件流的写法形式，标准库也提供了```io.stdin, io.stdout, io.stderr```这三个事先定义的C stream。
+* ```io.input(), io.output()```不带参数的调用会返回当前输入输出流的handle对象。临时写到其他handle里面可以这么写
+
+```lua
+local  temp = io.input()
+io.input("newinput")
+while true
+	do something
+end
+io.input():close()
+io.input(temp)
+```
+
+* In fact, ```io.read(args)``` is a shorthand for ```io.input():read(args)```，相当于将使用当前输出流对象调用read方法。
