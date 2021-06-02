@@ -119,3 +119,79 @@ delete a branch locally and remotely.
 
 
 暂时写到这里，后面有机会再加，bitbucket的教程还是蛮不错的。
+
+### Git Stash
+
+实习工作原因有的时候会遇到下面这种情况：
+
+> 1. 你在某个分支上开发并存在一些改动，但是你还不想提交
+> 2. 此时你想切换到其他分支工作或者开始另外的一些工作
+
+git stash就相当于把你的work directory中的内容存到一个栈中，然后你tracked到的内容改动保存起来，再次输入git status不会显示这些文件的改动
+
+```shell
+git stash
+git stash list # 查看所有stash内容
+```
+
+将变动从栈中移除并且将改动重新挪回工作区
+
+```shell
+git stash pop
+```
+
+如果想要移回改动，但是栈中内容也不会消失
+
+```shell
+git stash apply
+```
+
+如果想要保存untracked files，那么可以加上-u选项
+
+```shell
+git stash -u
+git stash -a # 将ignored files的变动也保存起来
+```
+
+因为可以管理多个stash，所以需要在每次stash的时候添加一些消息来帮助我们进行辨别。
+
+```shell
+git stash save <message> # 相当于git commit -m 中的消息
+```
+
+默认情况下pop会选择最近的一次stash，当然我们也可以手动进行选择
+
+```shell
+git stash pop stash@{2}
+```
+
+需要查看git stash中的内容时
+
+```shell
+git stash show [-p] # p会显示详细内容
+```
+
+stash支持部分存储的功能，你可以选择某几个文件的内容，甚至可以选择某个文件的某部分内容，
+
+```shell
+git stash -p #  会询问你一个个语句块，哪个需要stash起来
+```
+
+stash的hunk命令还有一些，不在这里列出来了。
+
+如果当前分支的内容和stash存起来的内容存在冲突，那么可以从stash的内容直接新建一个分支。
+
+```shell
+git stash brach <branch-name> stash@{1} # pop the specified stash content
+```
+
+删除指定stash
+
+```shell
+git stash drop stash@{1}
+git stash clear # 删除所有分支
+```
+
+#### git stash 工作流程
+
+这一部分有机会再补，使用的话上面足矣
