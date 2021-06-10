@@ -195,3 +195,41 @@ git stash clear # 删除所有分支
 #### git stash 工作流程
 
 这一部分有机会再补，使用的话上面足矣
+
+### Git Submodule
+
+项目中有使用到git submodule，之前没有使用过，现在稍微记录一下。
+
+* git repository的一大缺点就是无法跟踪外部的依赖，虽然可以通过Ruby Gems或NPM这种软件来管理，但是外部代码的编辑和修改还是无法跟踪到
+* 子模块相当于主repository中想要跟踪的外部代码，而且只会跟踪到特定的提交，同时也不会也在主repository更新的时候进行update.
+
+适用于以下场景
+
+* 外部代码版本更迭较快，向指定外部代码在一个固定的版本
+* 项目中有一个不需要经常更新的组件
+* 将项目中的一部分授权给第三方，需要在固定时间进行整合，同样这种情况也不需要经常进行更新。
+
+**常用指令**
+
+```shell
+# Inside a git repository
+git submodule add <url>
+# now that we've added a submodule to a git repository
+```
+
+此时会出现两个新文件，一个是url中指向的文件夹以及.gitmodule文件，此时将仓库改动提交并push到远程仓库即可。
+
+当你clone一个含有子模块的仓库到本地时，子模块中是不会有文件的。需要执行以下命令进行初始化。
+
+```shell
+# update .git/config with the mapping from .gitmodule files
+git submodule init 
+# fetch all data from the submodule project and check out the mapped commit
+git submodule update
+```
+
+当仓库中存在多个子模块的时候，只有被init的子模块才会被创建，在之后的update中才会更新。
+
+**子模块的workflow**
+
+如果在local的子模块中进行改动，先要在子模块中进行提交和push，之后需要再次切换到主目录中将再次add, commit和push改动。
