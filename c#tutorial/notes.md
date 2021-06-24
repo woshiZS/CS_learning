@@ -160,7 +160,7 @@ static void Foo(StringBuilder fooSB){
 
 		1. out修饰的参数在传入之前不需要初始化
   		2. 参数在函数返回之前必须初始化
-  		3. out修饰符一般是为了可以有多个返回值，参数做返回值
+    		3. out修饰符一般是为了可以有多个返回值，参数做返回值
 
 （还是C的指针方便，搞这么多修饰符反而容易绕晕）
 
@@ -193,7 +193,7 @@ static void Foo(StringBuilder fooSB){
 
 #### Null Operators
 
-* null-coalescing operator(??)：如果第一个操作数不为null, 就赋值为null, 否则为第二个操作数
+* null-coalescing operator(??)：如果第一个操作数不为null, 就是原来的值, 否则为第二个操作数
 
 * Null-coalescing assignment operator(??=): 就是说赋值符号左边操作数为空，就赋值，否则不赋值（在lazily calculated properties中特别有用）
 
@@ -204,5 +204,24 @@ static void Foo(StringBuilder fooSB){
   string s = sb?.ToString();
   ```
 
-  该符号具有短路效应，即如果左边的操作数是null，剩余的表达式都不会去计算。所以在有连续为null的情况下，可以使用连续的null-condition character.
+  该符号具有短路效应，即如果左边的操作数是null，剩余的表达式都不会去计算。所以在有连续为null的情况下，可以使用连续的null-condition character.就是说连续调用成员的成员的成员这种，可以避免成员为空抛错
+  
+  **但是有一定需要注意，就是最后的类型要可以为空，像是int类型的话，他不可以为空，所以最后一个类型必须是Nullable Value Types**
+  
+  我们也可以调用一个方法，如果调用的object是空，相当于没有进行调用
 
+#### Declaration
+
+* 这里有一点和C++不太一样，没有前置声明的说法，变量在后边声明，前面也有效。当然实际使用应该尽量避免同名变量的使用。
+* switch得用法里面可以使用goto + <label\>
+* switch还可以使用object类型，甚至还可以像条件断点那样，添加when关键字
+* switch甚至还可以使用到expression，这里就不细聊了。
+* Try和finally好像还有其他规则，这里得等到之后再去看了
+
+#### NameSpace
+
+* using static可以直接使用静态成员
+* namespace内部也可以使用using指令
+* using也可以用作别名，和alias差不多
+* 当引用到同名的namespace但是不同的dll，使用extern来解决模棱两可的应用问题，同时在这之前也要修改XML文件。
+* 后面有说到内部class和外部同名namespace中的同名类冲突，个人认为这种情况太过于少见，实际情况中应该尽量避免这种情况的发生。

@@ -233,3 +233,18 @@ git submodule update
 **子模块的workflow**
 
 如果在local的子模块中进行改动，先要在子模块中进行提交和push，之后需要再次切换到主目录中将再次add, commit和push改动。
+
+### 实际问题场景
+
+问题描述：项目中遇到问题，feature分支上又提交没有测试完成，存在一部分提交没有merge到主分支，导致新拉出来的分支是没有当前分支的提交，因为实际场景中git和svn都有用到，所以这里两边都说一下。
+
+##### GIT 当前分支领先于需要切换分支
+
+采用cherry pick将新的提交pick到新分支，具体步骤如下：
+
+* 切换到目的分支
+* 选取自己需要cherry pick的分支，选择对应log，然后选择cherry pick即可，如果有conflct，则需要自己手动再merge一遍，最后push到远端仓库
+
+##### SVN对应情况
+
+操作和git差不多，不过这边只有merge，也是先切换到对应分支，选择对应提交记录，merge完之后commit即可，注意提交信息需要打开log选择倒数第一次的提交message。
