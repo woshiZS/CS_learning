@@ -257,11 +257,17 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  int rev_x = ~x + 1;
-  y += rev_x;
+  // consider overflow conditions, x too small, y too large
+  // like x = 0x80000000, y = 0x7fffffff,y - x will be negative
+  // other condition like x is to large y is too small, e.g:
+  // x = 0x7fffffff, y = 0x80000000, y - x will positive.
+  int sign_x = (x >> 31) & 1, sign_y = (y >> 31) & 1, c1, c2;
+  c1 = sign_x & ~sign_y; // represent first condition
+  c2 = ~sign_x & sign_y; // represent the second condition.
+  y += ~x + 1;
   // check sign bit, if sign bit is 0, return 1, otherwise return 0
   y = y & (1 << 31);
-  return !y;
+  return c1 | (!y & !c2);
 }
 //4
 /* 
@@ -273,8 +279,13 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4 
  */
 int logicalNeg(int x) {
-  // get the highest bit 
-  return 2;
+  // any number except zero will have at least 1 at the sign bit
+  int rev_x = ~x + 1;
+  x = x | rev_x;
+  x = x & (1 << 31);
+  x = x >> 31;
+  x = ~x & 1;
+  return x;
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
@@ -304,7 +315,8 @@ int howManyBits(int x) {
   u2 = !!(x >> 2) << 1;
   x = x >> u2;
   u1 = !!(x >> 1);
-  return 1 + u16 + u8 + u4 + u2 + u1;
+  x = x >> u1;
+  return 1 + u16 + u8 + u4 + u2 + u1 + x;
 }
 //float
 /* 
@@ -349,6 +361,7 @@ int floatFloat2Int(unsigned uf) {
   unsigned sign = (uf & 0x80000000u);
   unsigned exp = (uf & 0x7F800000u) >> 23;
   unsigned fraction = (uf & 0x007FFFFFu) | 0x00800000u;
+  int ret;
   if((exp ^ 0x7F800000u) == 0)
     return 0x80000000u;
   // denormalized conditions
@@ -362,9 +375,13 @@ int floatFloat2Int(unsigned uf) {
   if(exp > 157)
     return 0x80000000u;
   if(exp >= 150)
-    return (fraction << (exp - 150)) | sign;
+    ret = fraction << (exp - 150);
   else
-    return (fraction >> (150 - exp)) | sign;
+    ret = fraction >> (150 - exp);
+
+  if(sign)
+    ret = ~ret + 1;
+  return ret;
 }
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x

@@ -122,15 +122,15 @@ Example usages:
 
     unix> ./ishow 0x27
     Hex = 0x00000027,	Signed = 39,	Unsigned = 39
-
+    
     unix> ./ishow 27
     Hex = 0x0000001b,	Signed = 27,	Unsigned = 27
-
+    
     unix> ./fshow 0x15213243
     Floating point value 3.255334057e-26
     Bit Representation 0x15213243, sign = 0, exponent = 0x2a, fraction = 0x213243
     Normalized.  +1.2593463659 X 2^(-85)
-
+    
     linux> ./fshow 15213243
     Floating point value 2.131829405e-38
     Bit Representation 0x00e822bb, sign = 0, exponent = 0x01, fraction = 0x6822bb
@@ -138,3 +138,17 @@ Example usages:
 
 
 
+### lab总结
+
+**环境搭建部分**
+
+* 编译选项中有-m32这一选项，所以有的dll会有缺失，这时候
+
+  ```shell
+  sudo apt update
+  sudo apt install gcc-mutilib
+  ```
+
+  即可修复环境
+
+* int类型中还是需要一些技巧的，尤其是howmanybits的二分，这种思路都可以学习一下，另外书还没有看完，可以慢慢来看（这种先做lab再看书也是很奇葩了）
