@@ -4,7 +4,7 @@
 
 ### Git remote
 
-* 不同于SVN有一个固定中心，git更像那种p2p，任意两个人之间都可以collaborate。
+* 不同于SVN有一个固定中心，固定中心的意思是commit就相当于git的commit和push，本地只是一份clone，真正的记录只有远端库一份，git更像那种p2p，任意两个人之间都可以collaborate。
 
 > The `git remote` command lets you create, view, and delete connections to other repositories.
 
