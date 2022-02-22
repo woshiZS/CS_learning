@@ -30,6 +30,51 @@
 
 ```git push <remote-name> <branch-name>```: 将本地push到远程标签的某个分支之上。
 
+### Git Checkout
+
+主要是因为git fetch需要显示使用git checkout作为前提，所以把这里也再巩固一遍（主要是和分支有关的内容）。
+
+git checkout的功能就是切换到某个特定分支（切换到不同的开发环境）。
+
+* checkout和clone的区别
+
+> 前者是在本地的分支之间进行切换，而后者做的是将远端代码拉到本地。
+
+* Existing branches
+
+  ```bash
+  git branch # 列出所有分支
+  git checkout <branch_name> # 选择一个分支进行切换，注意切换之前你的work tree是clean的
+  ```
+
+* New branches
+
+git checkout和git branch息息相关，
+
+```bash
+git branch <new-branch-name>	# 创建新分支
+git checkout <new-branch-name>	# 切换到新分支
+git checkout -b <new-branch-name>	# 上面两个指令的内容合并到一起
+git checkout -b <new-branch-name> <existing-branch> # 默认是基于head创建新分支，可选最后一个参数作为新分支的base
+```
+
+切换分支的history可以使用```git reflog```查看
+
+* Git checkout Remote branch
+
+```bash
+git fetch --all # 从远端获取所有分支的内容
+git checkout <remote-branch-name> # 新版git可以像本地切换分支一样切换到远端分支
+git checkout -b <remote-branch> origin/<remote-branch> # 老版本git需要基于远端分支显示创建一个新的分支
+# 或者可以创建一个新的分支，然后通过reset到远端分支
+git checkout -b <new-branch-name>
+git reset --hard origin/<branch-name>
+```
+
+* Detached HEADS
+
+首先要了解HEAD是git用来表示current snapshot的方式，checkout的参数可以是分支也可以是提交，但是参数是提交的时候，就进入了detached的状态，意思就是head现在没有了上下文，具体也不多探讨，但是checkout到一个commit多用于你去看一个老的提交干了写什么事情，其他的情况都是不推荐直接chekcout到一个单独的commit的。
+
 ### Git fetch
 
 简单而言是一种比较他人工作与自己仓库的方式，使用fetch指令需要显式的使用git checkout拉到另外一个分支，换言之，git pull算是一种比较激进的策略，采取的是拉取之后直接merge的方式。
