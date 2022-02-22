@@ -304,7 +304,7 @@ int howManyBits(int x) {
   int sign = x >> 31, u16, u8, u4, u2, u1;
   // tranverse all the numbers to positive numbers, and needed bit will not change.
   x = (sign & ~x) | (~sign & x);
-  // check if the higher 16 bits contains 1, if it is, it will be 1, otherwise will be 1.
+  // check if the higher 16 bits contains 1, if it is, it will be 1, otherwise will be 0.
   u16 = !!(x >> 16) << 4;
   // if upper 16 bit has 1, we can jsut move 16 bit to the right and test the upper 8 bit
   x = x >> u16;
