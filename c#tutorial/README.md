@@ -25,7 +25,7 @@ public class Example<T> where T : struct{
 
 
 
-![image-20220222152226029](.\pics\il.png)
+![image-20220222152226029](./pics/il.png)
 
 存在一个问题就是，即使实际调用中的类型是int, float（c#内置已经实现了Equals方法），但是被用作泛型的时，c#编译器并不清楚该泛型实现了IEquatable接口，所以我们可以手动再加一个where限制，即可避免装箱调用Equals. 所以在泛型限制的时候需要在后面再加IEquatable<T\>限定。
 
