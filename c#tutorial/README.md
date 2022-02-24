@@ -40,3 +40,27 @@ stackoverflow的解释
 #### 架构设计的一些小TIPS
 
 因为最近实习用的是ECS架构，然而在实际项目中system中的内容比较杂乱，老板要求整个system看得干净一点，整体的设计架构就是先设计一个基类接口，然后在每个类别中进行实现，但是**这样又会遇到一个问题，并不是每个基类都需要某种feature，这种多余的堆砌是没有必要的，这时候其实可以将新的feature进行拆分，实际各个类实现各个接口的组合**（貌似有点类似于多继承，但是光看书理解的并没有这么深）。总而言之就是把各个功能的接口进行拆分，有机会的话明天再回顾一下多继承的坏处。
+
+
+
+* enum可以是相同的值，有的时候可能会有warning，类似于这种：CA1069: Enums should not have duplicate values。可以像下面这样修改
+
+```c#
+enum E
+{
+   Field1 = 1,
+   AnotherNameForField1 = Field1,   // This is fine
+   Field2 = 2,
+   Field3 = 3,   // This is now fine
+}
+// or like this example below
+enum E
+{
+   Field1 = 1,
+   AnotherNameForField1 = Field1,   // This is fine
+   Field2 = 2,
+   Field3 = Field2,   // This is also fine
+}
+```
+
+用一个新的常量或者是用前面已经声明的值去赋值都是可以的。
