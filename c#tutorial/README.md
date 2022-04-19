@@ -75,3 +75,7 @@ enum E
 > * 给gameObject添加animator，并且创建新的animator controller挂载到animator组件上，之后再animation中创建自己需要的animation clip即可
 
 之后做了3d的例子再来补充。
+
+#### List && Array difference
+
+* Array在memory中是连续的，List内存位置是随机的
