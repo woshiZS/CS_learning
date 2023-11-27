@@ -211,7 +211,7 @@ git stash save <message> # 相当于git commit -m 中的消息
 git stash list # 查看所有的stash
 ```
 
-默认情况下pop会选择最近的一次stash，当然我们也可以手动进行选择
+默认情况下pop会选择最近的一次stash，当然我们也可以手动进行选择（至于@后面的内容可以从```git stash list```显示的输出中获取）
 
 ```shell
 git stash pop stash@{2}
@@ -237,6 +237,8 @@ git stash -p #  会询问你一个个语句块，哪个需要stash起来
 | q       | quit; do not stash this hunk or any of the remaining ones    |
 | a       | stash this hunk and all later hunks in the file              |
 | d       | do not stash this hunk or any of the later hunks in the file |
+| s       | split this hunk into smaller hunks                           |
+| y       | stash this hunk                                              |
 
 如果当前分支的内容和stash存起来的内容存在冲突，那么可以从stash的内容直接新建一个分支, 基于的提交是创建stash时最近的一次的提交。
 
